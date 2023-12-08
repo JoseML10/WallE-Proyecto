@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "14badafd-1f4c-4f05-a105-bc4a622c52bd": {
+      "ProjectGuid": "14badafd-1f4c-4f05-a105-bc4a622c52bd",
+      "DisplayName": "ClassLibrary1",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
