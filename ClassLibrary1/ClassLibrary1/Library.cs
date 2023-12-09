@@ -12,6 +12,39 @@ namespace ClassLibrary1
         public abstract object Evaluate(Entorno entorno);
     }
 
+    public class Number : Instruccion
+{
+    public int Value { get; }
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+   
+
+        public override object Evaluate(Entorno entorno)
+        {
+            return Value;
+        }
+    }
+
+    public class SecuenceFigure : Instruccion
+    {
+        public List<Identifier> secuenceFigure { get; }
+
+        public SecuenceFigure(List<Identifier> secuenceFigure)
+        {
+            this.secuenceFigure = secuenceFigure;
+        }
+        public override object Evaluate(Entorno entorno)
+        {
+            return null;
+        }
+    }
+
+
+
     public sealed class Identifier : Instruccion
     {
         public string name {get;}
@@ -38,9 +71,19 @@ namespace ClassLibrary1
         public override object Evaluate(Entorno entorno)
         {
             
-            entorno.figuras.Add((Figura)ToDraw.Evaluate(entorno));
-            
+           if(ToDraw.GetType() == typeof(SecuenceFigure) )
+            {   var secuence = (SecuenceFigure)ToDraw;
+                foreach( Identifier id in secuence.secuenceFigure)
+                {
+                     entorno.figuras.Add((Figura)id.Evaluate(entorno));
+                }
+            }
+            else
+            {
+                entorno.figuras.Add((Figura)ToDraw.Evaluate(entorno));
+            }
             return null;
+
 
 
         }
@@ -54,63 +97,72 @@ namespace ClassLibrary1
     }
 
 
-    public sealed class FunctionLine : Funcion
+    public sealed class FunctionLine : Figura
     {
 
-        public Point P1 { get; }
-        public Point P2 { get; }
+        public Point Punto1 { get; }
+        public Point Punto2 { get; }
+
+        public override string nombre { get; set; }
 
         public FunctionLine(Point P1, Point P2)
         {
 
-            this.P1 = P1;
-            this.P2 = P2;
+            this.Punto1 = P1;
+            this.Punto2 = P2;
 
         }
 
         public override object Evaluate(Entorno entorno)
         {
-            throw new NotImplementedException();
+            //this.nombre = "line";
+            //var point = new Variable(nombre, this);
+            //entorno.DefinirVariable(point);
+            //entorno.figuras.Add((Figura)this);
+            return this;
+
         }
     }
 
-    public sealed class SegmentFunction : Funcion
+    public sealed class SegmentFunction : Figura
     {
 
-        public Point P1 { get; }
-        public Point P2 { get; }
+        public Point Punto1 { get; }
+        public Point Punto2 { get; }
+        public override string nombre { get; set ; }
 
         public SegmentFunction(Point P1, Point P2)
         {
 
-            this.P1 = P1;
-            this.P2 = P2;
+            this.Punto1 = P1;
+            this.Punto2 = P2;
 
         }
 
         public override object Evaluate(Entorno entorno)
         {
-            throw new NotImplementedException();
+            return this;
         }
     }
 
-    public sealed class RayFunction : Funcion
+    public sealed class RayFunction : Figura
     {
 
-        public Point P1 { get; }
-        public Point P2 { get; }
+        public Point Punto1 { get; }
+        public Point Punto2 { get; }
+        public override string nombre { get; set; }
 
         public RayFunction(Point P1, Point P2)
         {
 
-            this.P1 = P1;
-            this.P2 = P2;
+            this.Punto1 = P1;
+            this.Punto2 = P2;
 
         }
 
         public override object Evaluate(Entorno entorno)
         {
-            throw new NotImplementedException();
+            return this;
         }
     }
 
@@ -135,29 +187,33 @@ namespace ClassLibrary1
         }
     }
 
-    public sealed class ArcFunction : Funcion
+    public sealed class ArcFunction : Figura
     {
 
-        public Point P1 { get; }
-        public Point P2 { get; }
+        public override string  nombre { get; set ;}
 
-        public Point P3 { get; }
+        public Point Centro { get; }
+        public Point Punto2 { get; }
+
+        public Point Punto3 { get; }
         public double Measure { get; }
 
         public ArcFunction(Point P1, Point P2, Point P3, double Measure)
         {
 
-            this.P1 = P1;
-            this.P2 = P2;
-            this.P3 = P3;
+            Centro = P1;
+            this.Punto2 = P2;
+            this.Punto3 = P3;
             this.Measure = Measure;
 
         }
 
         public override object Evaluate(Entorno entorno)
         {
-            throw new NotImplementedException();
+            return this;
         }
+
+        
     }
 
     public sealed class IntersectFunction : Funcion
@@ -204,7 +260,7 @@ namespace ClassLibrary1
     {
 
 
-        public abstract string nombre { get; }
+        public abstract string nombre { get; set; }
 
     }
     public sealed class CircleFunction : Figura
@@ -214,7 +270,7 @@ namespace ClassLibrary1
 
         public double Measure { get; }
 
-        public override string nombre => throw new NotImplementedException();
+        public override string nombre { get; set; }
 
         public CircleFunction(Point P1, double Measure)
         {
@@ -226,7 +282,7 @@ namespace ClassLibrary1
 
         public override object Evaluate(Entorno entorno)
         {
-            throw new NotImplementedException();
+            return this;
         }
     }
 
@@ -279,15 +335,17 @@ namespace ClassLibrary1
     { 
         public Coord Coord {get;}
 
-        public override string nombre  {get;}
+        public override string nombre  { get; set; }
 
-      
+        private static Random r = new Random();
+
+
 
         public Point(string nombre )
         {
            
            this.nombre= nombre;
-            Random r = new Random();
+            
             int  x = r.Next(1, 300);
             int y = r.Next(1, 300);
             Coord cor = new Coord(x, y);
@@ -327,7 +385,7 @@ namespace ClassLibrary1
         }
 
 
-        public override string nombre { get; }
+        public override string nombre { get; set; }
 
         public override object Evaluate(Entorno entorno)
         {
@@ -346,11 +404,6 @@ namespace ClassLibrary1
             Point p2 = new Point("p1");
             Point p1 = new Point("p2");
 
-            if(p2.Coord.X==p1.Coord.X && p2.Coord.Y==p1.Coord.Y)
-            {
-                p1.Coord.X += 20;
-                p1.Coord.Y += 20;
-            }
             Punto1 = p1;
             Punto2 = p2;
             this.nombre = nombre;
@@ -358,7 +411,7 @@ namespace ClassLibrary1
         }
 
 
-        public override string nombre { get; }
+        public override string nombre { get; set; }
 
         public override object Evaluate(Entorno entorno)
         {
@@ -370,16 +423,25 @@ namespace ClassLibrary1
 
     public sealed class Ray : Figura
     {
+        public Point Punto1 { get; }
+        public Point Punto2 { get; }
 
         public Ray(string nombre)
         {
+            Point p1 = new Point("p1");
+            Point p2 = new Point("p2");
+
+            
+
+            Punto1 = p1;
+            Punto2 = p2;
 
             this.nombre = nombre;
 
         }
 
 
-        public override string nombre { get; }
+        public override string nombre { get; set; }
 
         public override object Evaluate(Entorno entorno)
         {
@@ -393,15 +455,24 @@ namespace ClassLibrary1
     public sealed class Segment : Figura
     {
 
+        public Point Punto1 { get; }
+        public Point Punto2 { get; }
+
         public Segment(string nombre)
         {
+            Point p1 = new Point("p1");
+            Point p2 = new Point("p2");
+
+
+            Punto1 = p1;
+            Punto2 = p2;
 
             this.nombre = nombre;
 
         }
 
 
-        public override string nombre { get; }
+        public override string nombre { get; set; }
 
         public override object Evaluate(Entorno entorno)
         {
@@ -422,7 +493,7 @@ namespace ClassLibrary1
 
     public sealed class PointSecuence : Secuence<Point>
     {
-        public override string nombre { get; }
+        public override string nombre { get; set; }
 
         public override List<Point> SecuenceItems { get; }
 
@@ -443,7 +514,7 @@ namespace ClassLibrary1
     {
 
 
-        public override string nombre { get; }
+        public override string nombre { get; set; }
 
         public override List<Line> SecuenceItems { get; }
 
@@ -511,7 +582,118 @@ namespace ClassLibrary1
         }
     }
 
-    public class DeclaracionIdentificador : Instruccion
+
+
+
+
+public class AnalizeAsignation : Instruccion
+{
+    public List<string> Nombre { get; }
+    public Instruccion Value { get; }
+
+    public AnalizeAsignation(List<string> nombre, Instruccion value)
+    {
+        Nombre = nombre;
+        Value = value;
+    }
+
+    public override object Evaluate(Entorno entorno)
+    {
+        // Si Value es una secuencia 
+        if (Value is Secuence<Figura> secuencia)
+        {
+            var valores = secuencia;
+
+            for (int i = 0; i < Nombre.Count; i++)
+            {
+                // Si se usa "_" como uno de los nombres de la variable, se ignora la asignación correspondiente
+                if (Nombre[i] == "_")
+                    continue;
+
+                // Si se piden valores inexistentes a una secuencia, se guarda en la variable un tipo undefined
+                if (i >= valores.SecuenceItems.Count())
+                {
+                    //entorno.DefinirVariable(new Variable(Nombre[i], new Undefined()));
+                    continue;
+                }
+
+                // Si el elemento de Nombres es el último de la lista, se le asigna el resto de la secuencia
+                if (i == Nombre.Count - 1)
+                {
+                    var resto = valores.SecuenceItems.Skip(i).ToList();
+
+
+                    // Determina el tipo de los elementos en la lista 'resto'
+                    var tipo = resto[0].GetType();
+
+                    if (tipo == typeof(Point))
+                    {
+
+                        entorno.DefinirVariable(new Variable(Nombre[i], new PointSecuence(Nombre[i], resto.Cast<Point>().ToList())));
+                        break;
+                    }
+
+
+
+                    else if (tipo == typeof(Line))
+                    {
+
+                        entorno.DefinirVariable(new Variable(Nombre[i], new LineSecuence(Nombre[i], resto.Cast<Line>().ToList())));
+                        break;
+                    }
+
+                }
+
+                // Se asigna uno con uno cada variable a cada valor de la secuencia
+                entorno.DefinirVariable(new Variable(Nombre[i], valores.SecuenceItems[i]));
+
+            }
+        }
+
+        else
+        {
+            // Si Value no es una secuencia, se asigna el valor a todas las variables
+            foreach (var nombre in Nombre)
+            {
+
+                entorno.DefinirVariable(new Variable(nombre, Value));
+            }
+        }
+
+        return null;
+    }
+
+
+}
+
+
+public class FunctionDeclaration : Instruccion
+    {
+        public string Nombre { get; }
+        public List<string> Parametros { get; }
+        public Instruccion Cuerpo { get; }
+
+        public FunctionDeclaration(string nombre, List<string> parametros, Instruccion cuerpo)
+        {
+            Nombre = nombre;
+            Parametros = parametros;
+            Cuerpo = cuerpo;
+
+        }
+
+        public override object Evaluate(Entorno entorno)
+    {
+
+    
+
+
+    return null;
+    }
+    }
+
+
+
+     public class DeclaracionIdentificador : Instruccion
     {
         public List<string> Nombre { get; }
         public Instruccion Value { get; }
@@ -577,12 +759,12 @@ namespace ClassLibrary1
 
             else
             {
-                // Si Value no es una secuencia, se asigna el valor a todas las variables
-                //foreach (var nombre in Nombre)
-                //{
+               
+                foreach (var nombre in Nombre)
+            {
 
-                //    entorno.DefinirVariable(new Variable(nombre, Value));
-                //}
+                   entorno.DefinirVariable(new Variable(nombre, Value));
+                }
             }
 
             return null;
@@ -591,33 +773,14 @@ namespace ClassLibrary1
 
     }
 
-    public class FunctionDeclaration : Instruccion
-    {
-        public string Nombre { get; }
-        public List<string> Parametros { get; }
-        public Instruccion Cuerpo { get; }
+   
 
-        public FunctionDeclaration(string nombre, List<string> parametros, Instruccion cuerpo)
-        {
-            Nombre = nombre;
-            Parametros = parametros;
-            Cuerpo = cuerpo;
-
-        }
-
-        public override object Evaluate(Entorno entorno)
-    {
 
     
 
 
-    return null;
-    }
-    }
-
 
         
-
     
 
 
