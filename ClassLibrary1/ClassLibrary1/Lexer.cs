@@ -54,8 +54,11 @@ namespace ClassLibrary1
         Concatenador,
         PointSecuence,
         LineFunction,
+        IfKeyWord,
+        ElseKeyWord,
+        ThenKeyWord,
+        Arc,
     }
-
 
 
 
@@ -86,32 +89,46 @@ namespace ClassLibrary1
             string codigoFuente;
             int indice;
 
-            Dictionary<string, TipoToken> palabrasReservadas = new Dictionary<string, TipoToken>
+        Dictionary<string, TipoToken> palabrasReservadas = new Dictionary<string, TipoToken>
         {
             { "print", TipoToken.PalabraReservada },
             { "function", TipoToken.PalabraReservada },
             { "let", TipoToken.PalabraReservada },
             { "in", TipoToken.PalabraReservada },
-            { "if", TipoToken.PalabraReservada },
-            { "else", TipoToken.PalabraReservada },
+            { "if", TipoToken.IfKeyWord},
+            { "else", TipoToken.ElseKeyWord },
+             { "then", TipoToken.ThenKeyWord },
             { "draw", TipoToken.PalabraReservada },
             { "measure", TipoToken.PalabraReservada },
             { "color", TipoToken.PalabraReservada },
             { "restore", TipoToken.PalabraReservada },
             { "import", TipoToken.PalabraReservada },
-            { "circle", TipoToken.PalabraReservada },
-            { "line", TipoToken.PalabraReservada },
-            { "segment", TipoToken.PalabraReservada },
-            { "ray", TipoToken.PalabraReservada },
-            { "arc", TipoToken.PalabraReservada },
+            { "circle", TipoToken.Circle },
+            { "line", TipoToken.Line },
+            { "segment", TipoToken.Segment },
+            { "ray", TipoToken.Ray },
+            { "arc", TipoToken.Arc },
             { "randoms", TipoToken.PalabraReservada},
-            { "point", TipoToken.PalabraReservada },
+            { "point", TipoToken.Point },
             { "samples", TipoToken.PalabraReservada },
 
 
         };
 
-            Dictionary<string, TipoToken> Math = new Dictionary<string, TipoToken>
+        Dictionary<string, TipoToken> functionTokens = new Dictionary<string, TipoToken>
+        {
+
+            { "circle", TipoToken.CircleFunction },
+            { "line", TipoToken.LineFunction },
+            { "segment", TipoToken.SegmentFunction },
+            { "ray", TipoToken.RayFunction},
+            { "arc", TipoToken.ArcFunction },
+
+
+        };
+
+
+        Dictionary<string, TipoToken> Math = new Dictionary<string, TipoToken>
         {
             { "sin", TipoToken.Math},
             { "cos", TipoToken.Math},
@@ -228,49 +245,47 @@ namespace ClassLibrary1
                     }
 
 
-                    if (char.IsLetter(caracterActual) || caracterActual == '_')
+                if (char.IsLetter(caracterActual) || caracterActual == '_')
+                {
+                    string palabra = "";
+                    while (indice < codigoFuente.Length && (char.IsLetterOrDigit(codigoFuente[indice]) || codigoFuente[indice] == '_'))
                     {
-                        string palabra = "";
-                        while (indice < codigoFuente.Length && (char.IsLetterOrDigit(codigoFuente[indice]) || codigoFuente[indice] == '_'))
-                        {
-                            palabra += codigoFuente[indice];
-                            indice++;
-                        }
-
-                        if (palabrasReservadas.ContainsKey(palabra))
-                        {
-                            string aux = palabra;
-
-                            while (indice < codigoFuente.Length && codigoFuente[indice] == ' ')
-                            {
-                                indice++;
-                            }
-
-                            if ((codigoFuente[indice] == '(') || aux == "let" || aux == "in" || aux == "else"
-                            || aux == "color" || aux == "restore" || aux == "draw" )
-                            {
-
-                                tokens.Add(new Token(palabrasReservadas[palabra], aux));
-                            }
-                            else
-                            {
-                                tokens.Add(new Token(TipoToken.Identificador, aux));
-                            }
-
-
-                        }
-                        else if (Math.ContainsKey(palabra))
-                        {
-                            tokens.Add(new Token(Math[palabra], palabra));
-                        }
-                        else
-                        {
-                            tokens.Add(new Token(TipoToken.Identificador, palabra));
-                        }
-                        continue;
+                        palabra += codigoFuente[indice];
+                        indice++;
                     }
 
-                    if (caracterActual == '+' || caracterActual == '-' || caracterActual == '*'
+                    while (codigoFuente[indice] == ' ')
+                    {
+                        indice++;
+                    }
+
+                    if (functionTokens.ContainsKey(palabra) && codigoFuente[indice] == '(')
+                    {
+                        tokens.Add(new Token(functionTokens[palabra], palabra));
+                        continue;
+
+                    }
+                    else if (Math.ContainsKey(palabra))
+                    {
+                        tokens.Add(new Token(Math[palabra], palabra));
+                        continue;
+
+                    }
+                    else if (palabrasReservadas.ContainsKey(palabra))
+                    {
+                        tokens.Add(new Token(palabrasReservadas[palabra], palabra));
+                        continue;
+
+                    }
+
+
+                    tokens.Add(new Token(TipoToken.Identificador, palabra));
+                    continue;
+
+
+                }
+
+                if (caracterActual == '+' || caracterActual == '-' || caracterActual == '*'
                         || caracterActual == '^' || caracterActual == '%'
                         || caracterActual == '/')
                     {
