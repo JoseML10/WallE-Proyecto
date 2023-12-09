@@ -29,20 +29,85 @@ namespace ClassLibrary1
         }
     }
 
-    public class SecuenceFigure : Instruccion
+    public class AnalizeAsignation : Instruccion
     {
-        public List<Identifier> secuenceFigure { get; }
+        public List<string> Nombre { get; }
+        public Instruccion Value { get; }
 
-        public SecuenceFigure(List<Identifier> secuenceFigure)
+        public AnalizeAsignation(List<string> nombre, Instruccion value)
         {
-            this.secuenceFigure = secuenceFigure;
+            Nombre = nombre;
+            Value = value;
         }
+
         public override object Evaluate(Entorno entorno)
         {
+            // Si Value es una secuencia 
+            if (Value is Secuence<Figura> secuencia)
+            {
+                var valores = secuencia;
+
+                for (int i = 0; i < Nombre.Count; i++)
+                {
+                    // Si se usa "_" como uno de los nombres de la variable, se ignora la asignación correspondiente
+                    if (Nombre[i] == "_")
+                        continue;
+
+                    // Si se piden valores inexistentes a una secuencia, se guarda en la variable un tipo undefined
+                    if (i >= valores.SecuenceItems.Count())
+                    {
+                        //entorno.DefinirVariable(new Variable(Nombre[i], new Undefined()));
+                        continue;
+                    }
+
+                    // Si el elemento de Nombres es el último de la lista, se le asigna el resto de la secuencia
+                    if (i == Nombre.Count - 1)
+                    {
+                        var resto = valores.SecuenceItems.Skip(i).ToList();
+
+
+                        // Determina el tipo de los elementos en la lista 'resto'
+                        var tipo = resto[0].GetType();
+
+                        if (tipo == typeof(Point))
+                        {
+
+                            entorno.DefinirVariable(new Variable(Nombre[i], new PointSecuence(Nombre[i], resto.Cast<Point>().ToList())));
+                            break;
+                        }
+
+
+
+                        else if (tipo == typeof(Line))
+                        {
+
+                            entorno.DefinirVariable(new Variable(Nombre[i], new LineSecuence(Nombre[i], resto.Cast<Line>().ToList())));
+                            break;
+                        }
+
+                    }
+
+                    // Se asigna uno con uno cada variable a cada valor de la secuencia
+                    entorno.DefinirVariable(new Variable(Nombre[i], valores.SecuenceItems[i]));
+
+                }
+            }
+
+            else
+            {
+                // Si Value no es una secuencia, se asigna el valor a todas las variables
+                foreach (var nombre in Nombre)
+                {
+
+                    entorno.DefinirVariable(new Variable(nombre, Value));
+                }
+            }
+
             return null;
         }
-    }
 
+
+    }
 
 
     public sealed class Identifier : Instruccion
@@ -549,7 +614,33 @@ namespace ClassLibrary1
 
 }
 
-    public class IfElseExpression : Instruccion
+    
+
+    public class FunctionDeclaration : Instruccion
+    {
+        public string Nombre { get; }
+        public List<string> Parametros { get; }
+        public Instruccion Cuerpo { get; }
+
+        public FunctionDeclaration(string nombre, List<string> parametros, Instruccion cuerpo)
+        {
+            Nombre = nombre;
+            Parametros = parametros;
+            Cuerpo = cuerpo;
+
+        }
+
+        public override object Evaluate(Entorno entorno)
+    {
+
+    
+
+
+    return null;
+    }
+    }
+
+public class IfElseExpression : Instruccion
     {
         public Instruccion Condicion { get; }
         public Instruccion ExpresionIf { get; }
@@ -582,118 +673,23 @@ namespace ClassLibrary1
         }
     }
 
-
-
-
-
-public class AnalizeAsignation : Instruccion
+public class SecuenceFigure : Instruccion
 {
-    public List<string> Nombre { get; }
-    public Instruccion Value { get; }
+    public List<Identifier> secuenceFigure { get; }
 
-    public AnalizeAsignation(List<string> nombre, Instruccion value)
+    public SecuenceFigure(List<Identifier> secuenceFigure)
     {
-        Nombre = nombre;
-        Value = value;
+        this.secuenceFigure = secuenceFigure;
     }
-
     public override object Evaluate(Entorno entorno)
     {
-        // Si Value es una secuencia 
-        if (Value is Secuence<Figura> secuencia)
-        {
-            var valores = secuencia;
-
-            for (int i = 0; i < Nombre.Count; i++)
-            {
-                // Si se usa "_" como uno de los nombres de la variable, se ignora la asignación correspondiente
-                if (Nombre[i] == "_")
-                    continue;
-
-                // Si se piden valores inexistentes a una secuencia, se guarda en la variable un tipo undefined
-                if (i >= valores.SecuenceItems.Count())
-                {
-                    //entorno.DefinirVariable(new Variable(Nombre[i], new Undefined()));
-                    continue;
-                }
-
-                // Si el elemento de Nombres es el último de la lista, se le asigna el resto de la secuencia
-                if (i == Nombre.Count - 1)
-                {
-                    var resto = valores.SecuenceItems.Skip(i).ToList();
-
-
-                    // Determina el tipo de los elementos en la lista 'resto'
-                    var tipo = resto[0].GetType();
-
-                    if (tipo == typeof(Point))
-                    {
-
-                        entorno.DefinirVariable(new Variable(Nombre[i], new PointSecuence(Nombre[i], resto.Cast<Point>().ToList())));
-                        break;
-                    }
-
-
-
-                    else if (tipo == typeof(Line))
-                    {
-
-                        entorno.DefinirVariable(new Variable(Nombre[i], new LineSecuence(Nombre[i], resto.Cast<Line>().ToList())));
-                        break;
-                    }
-
-                }
-
-                // Se asigna uno con uno cada variable a cada valor de la secuencia
-                entorno.DefinirVariable(new Variable(Nombre[i], valores.SecuenceItems[i]));
-
-            }
-        }
-
-        else
-        {
-            // Si Value no es una secuencia, se asigna el valor a todas las variables
-            foreach (var nombre in Nombre)
-            {
-
-                entorno.DefinirVariable(new Variable(nombre, Value));
-            }
-        }
-
         return null;
     }
-
-
 }
 
 
-public class FunctionDeclaration : Instruccion
-    {
-        public string Nombre { get; }
-        public List<string> Parametros { get; }
-        public Instruccion Cuerpo { get; }
 
-        public FunctionDeclaration(string nombre, List<string> parametros, Instruccion cuerpo)
-        {
-            Nombre = nombre;
-            Parametros = parametros;
-            Cuerpo = cuerpo;
-
-        }
-
-        public override object Evaluate(Entorno entorno)
-    {
-
-    
-
-
-    return null;
-    }
-    }
-
-
-
-     public class DeclaracionIdentificador : Instruccion
+public class DeclaracionIdentificador : Instruccion
     {
         public List<string> Nombre { get; }
         public Instruccion Value { get; }
