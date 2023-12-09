@@ -54,6 +54,10 @@ namespace ClassLibrary1
         Concatenador,
         PointSecuence,
         LineFunction,
+
+         IfKeyWord,
+        ElseKeyWord,
+        ThenKeyWord,
     }
 
 
@@ -92,8 +96,9 @@ namespace ClassLibrary1
             { "function", TipoToken.PalabraReservada },
             { "let", TipoToken.PalabraReservada },
             { "in", TipoToken.PalabraReservada },
-            { "if", TipoToken.PalabraReservada },
-            { "else", TipoToken.PalabraReservada },
+            { "if", TipoToken.IfKeyWord},
+            { "else", TipoToken.ElseKeyWord },
+             { "then", TipoToken.ThenKeyWord },
             { "draw", TipoToken.PalabraReservada },
             { "measure", TipoToken.PalabraReservada },
             { "color", TipoToken.PalabraReservada },
@@ -247,6 +252,8 @@ namespace ClassLibrary1
                             }
 
                             if ((codigoFuente[indice] == '(') || aux == "let" || aux == "in" || aux == "else"
+                                || aux == "if"
+                            || aux == "then"
                             || aux == "color" || aux == "restore" || aux == "draw" )
                             {
 
