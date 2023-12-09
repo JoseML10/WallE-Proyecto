@@ -58,6 +58,8 @@ namespace ClassLibrary1
          IfKeyWord,
         ElseKeyWord,
         ThenKeyWord,
+        Arc,
+
     }
 
 
@@ -104,13 +106,13 @@ namespace ClassLibrary1
             { "color", TipoToken.PalabraReservada },
             { "restore", TipoToken.PalabraReservada },
             { "import", TipoToken.PalabraReservada },
-            { "circle", TipoToken.PalabraReservada },
-            { "line", TipoToken.PalabraReservada },
-            { "segment", TipoToken.PalabraReservada },
-            { "ray", TipoToken.PalabraReservada },
-            { "arc", TipoToken.PalabraReservada },
+            { "circle", TipoToken.Circle },
+            { "line", TipoToken.Line},
+            { "segment", TipoToken.Segment },
+            { "ray", TipoToken.Ray },
+            { "arc", TipoToken.Arc },
             { "randoms", TipoToken.PalabraReservada},
-            { "point", TipoToken.PalabraReservada },
+            { "point", TipoToken.Point },
             { "samples", TipoToken.PalabraReservada },
 
 
