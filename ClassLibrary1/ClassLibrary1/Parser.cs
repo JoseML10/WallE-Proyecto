@@ -70,9 +70,9 @@ namespace ClassLibrary1
         public Instruccion Analize()
         {    
             if (tokenActual.Tipo == TipoToken.Identificador )
-            {                                   
-                 return AnalizeAsignation();
-            }
+             {                                   
+                  return AnalizeAsignation();
+             }
             if (tokenActual.Tipo == TipoToken.IfKeyWord )
             {                                  
                  return AnalizarIfElse();
@@ -83,28 +83,28 @@ namespace ClassLibrary1
 
         private Instruccion AnalizeExpresion()
         {    
-            if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "point")
+            if (tokenActual.Tipo == TipoToken.Point && tokenActual.Valor == "point")
             { 
                 return AnalizePoint();
             }
-            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "line")
-            {
-                return AnalizeLine();
-            }
+             else if (tokenActual.Tipo == TipoToken.Line && tokenActual.Valor == "line")
+             {
+                 return AnalizeLine();
+             }
 
             else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "draw")
             {   
                 return AnalizeDraw();
             }
-            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "circle")
+            else if (tokenActual.Tipo == TipoToken.Circle && tokenActual.Valor == "circle")
             {
                 return AnalizeCircle();
             }
-            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "ray")
+            else if (tokenActual.Tipo == TipoToken.Ray && tokenActual.Valor == "ray")
             {
                 return AnalizeRay();
             }
-            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "segment")
+            else if (tokenActual.Tipo == TipoToken.Segment && tokenActual.Valor == "segment")
             {
                return AnalizeLine();
             }
