@@ -12,6 +12,24 @@ namespace ClassLibrary1
         public abstract object Evaluate(Entorno entorno);
     }
 
+    public class Number : Instruccion
+{
+    public int Value { get; }
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+   
+
+        public override object Evaluate(Entorno entorno)
+        {
+            return Value;
+        }
+    }
+
+
     public sealed class Identifier : Instruccion
     {
         public string name {get;}
@@ -38,9 +56,19 @@ namespace ClassLibrary1
         public override object Evaluate(Entorno entorno)
         {
             
-            entorno.figuras.Add((Figura)ToDraw.Evaluate(entorno));
-            
+           if(ToDraw.GetType() == typeof(SecuenceFigure) )
+            {   var secuence = (SecuenceFigure)ToDraw;
+                foreach( Identifier id in secuence.secuenceFigure)
+                {
+                     entorno.figuras.Add((Figura)id.Evaluate(entorno));
+                }
+            }
+            else
+            {
+                entorno.figuras.Add((Figura)ToDraw.Evaluate(entorno));
+            }
             return null;
+
 
 
         }
@@ -643,9 +671,127 @@ namespace ClassLibrary1
     }
     }
 
+public class IfElseExpression : Instruccion
+    {
+        public Instruccion Condicion { get; }
+        public Instruccion ExpresionIf { get; }
+        public Instruccion ExpresionElse { get; }
+
+        public IfElseExpression(Instruccion condicion, Instruccion expresionIf, Instruccion expresionElse)
+        {
+            Condicion = condicion;
+            ExpresionIf = expresionIf;
+            ExpresionElse = expresionElse;
+        }
+
+        public override object Evaluate(Entorno entorno)
+        {
+            Instruccion condition =(Instruccion) Condicion.Evaluate(entorno);
+
+            if (!condition.Equals(0) || !condition.Equals(0) || !condition.Equals(0))
+
+            {
+                return ExpresionIf.Evaluate(entorno);
+            }
+
+
+
+
+            else
+            {
+                return ExpresionElse.Evaluate(entorno);
+            }
+        }
+    }
+
+     public class DeclaracionIdentificador : Instruccion
+    {
+        public List<string> Nombre { get; }
+        public Instruccion Value { get; }
+
+        public DeclaracionIdentificador(List<string> nombre, Instruccion value)
+        {
+            Nombre = nombre;
+            Value = value;
+        }
+
+        public override object Evaluate(Entorno entorno)
+        {
+            // Si Value es una secuencia 
+            if (Value is Secuence<Figura> secuencia)
+            {
+                var valores = secuencia;
+
+                for (int i = 0; i < Nombre.Count; i++)
+                {
+                    // Si se usa "_" como uno de los nombres de la variable, se ignora la asignación correspondiente
+                    if (Nombre[i] == "_")
+                        continue;
+
+                    // Si se piden valores inexistentes a una secuencia, se guarda en la variable un tipo undefined
+                    if (i >= valores.SecuenceItems.Count())
+                    {
+                        //entorno.DefinirVariable(new Variable(Nombre[i], new Undefined()));
+                        continue;
+                    }
+
+                    // Si el elemento de Nombres es el último de la lista, se le asigna el resto de la secuencia
+                    if (i == Nombre.Count - 1)
+                    {
+                        var resto = valores.SecuenceItems.Skip(i).ToList();
+
+
+                        // Determina el tipo de los elementos en la lista 'resto'
+                        var tipo = resto[0].GetType();
+
+                        if (tipo == typeof(Point))
+                        {
+
+                            entorno.DefinirVariable(new Variable(Nombre[i], new PointSecuence(Nombre[i], resto.Cast<Point>().ToList())));
+                            break;
+                        }
+
+
+
+                        else if (tipo == typeof(Line))
+                        {
+
+                            entorno.DefinirVariable(new Variable(Nombre[i], new LineSecuence(Nombre[i], resto.Cast<Line>().ToList())));
+                            break;
+                        }
+
+                    }
+
+                    // Se asigna uno con uno cada variable a cada valor de la secuencia
+                    entorno.DefinirVariable(new Variable(Nombre[i], valores.SecuenceItems[i]));
+
+                }
+            }
+
+            else
+            {
+               
+                foreach (var nombre in Nombre)
+            {
+
+                   entorno.DefinirVariable(new Variable(nombre, Value));
+                }
+            }
+
+            return null;
+        }
+
+
+    }
+
+   
+
+
+    
+
+
 
         
-
     
 
 
