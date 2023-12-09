@@ -252,7 +252,7 @@ namespace ClassLibrary1
                             }
 
                             if ((codigoFuente[indice] == '(') || aux == "let" || aux == "in" || aux == "else"
-                                || aux == "if"
+                                || aux == "if"|| aux == "point" || aux == "circle" || aux == "segment" || aux == "ray" || aux == "line"
                             || aux == "then"
                             || aux == "color" || aux == "restore" || aux == "draw" )
                             {
