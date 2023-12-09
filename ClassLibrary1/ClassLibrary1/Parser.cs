@@ -68,18 +68,26 @@ namespace ClassLibrary1
             return instructions;
         }
         public Instruccion Analize()
-        {
+        {    
+            if (tokenActual.Tipo == TipoToken.Identificador )
+            {                                   
+                 return AnalizeAsignation();
+            }
+            if (tokenActual.Tipo == TipoToken.IfKeyWord )
+            {                                  
+                 return AnalizarIfElse();
+            }
             Instruccion nodo = AnalizeExpresion();
             return nodo;
         }
 
         private Instruccion AnalizeExpresion()
-        {
-            if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "point")
+        {    
+            if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "point")
             { 
                 return AnalizePoint();
             }
-            else if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "line")
+            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "line")
             {
                 return AnalizeLine();
             }
@@ -88,15 +96,15 @@ namespace ClassLibrary1
             {   
                 return AnalizeDraw();
             }
-            else if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "circle")
+            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "circle")
             {
                 return AnalizeCircle();
             }
-            else if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "ray")
+            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "ray")
             {
                 return AnalizeRay();
             }
-            else if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "segment")
+            else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "segment")
             {
                return AnalizeLine();
             }
@@ -122,6 +130,16 @@ namespace ClassLibrary1
             else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor=="arc")
             {
                 return AnalizeArcFunction();
+            }
+
+             else if (tokenActual.Tipo == TipoToken.OpeningBrace)
+            {   
+                return AnalizeSecuence();
+            }
+
+            else if (tokenActual.Tipo == TipoToken.Numero )
+            {                                   
+                 return AnalizeNumber();
             }
 
 
@@ -195,6 +213,96 @@ namespace ClassLibrary1
             return new Draw(ToDraw);
 
         }
+
+        private Instruccion AnalizeAsignation()
+        {   List<string> nombres = new List<string>(); 
+            while(tokenActual.Tipo != TipoToken.OperadorAsignación)
+            {
+                  nombres.Add(tokenActual.Valor);
+                  siguienteToken(); 
+            }
+
+            siguienteToken();
+           
+           Instruccion asignation = AnalizeExpresion();
+           
+           
+           
+            
+            return new AnalizeAsignation(nombres,asignation);
+
+        }
+
+                 public Instruccion AnalizeNumber()
+
+         {  
+            int value = int.Parse(tokenActual.Valor);
+            siguienteToken();
+            return new Number(value);
+
+         }
+
+       public IfElseExpression AnalizarIfElse()
+        {
+            
+            siguienteToken();
+
+
+
+            Instruccion IfExpression = AnalizeExpresion();
+
+            
+            if (tokenActual.Tipo != TipoToken.ThenKeyWord)
+            {
+                throw new Exception("Error: Se esperaba la expresion ¨then¨.");
+
+            }
+            siguienteToken();
+             
+
+            Instruccion ThenExpression = AnalizeExpresion();
+            
+            if (tokenActual.Tipo != TipoToken.ElseKeyWord)
+            {
+                throw new Exception("Error: Se esperaba la expresion ¨Else¨.");
+
+            }
+
+             siguienteToken();
+            
+            Instruccion ElseExpression = AnalizeExpresion();
+
+
+
+
+            return new IfElseExpression(IfExpression, ThenExpression, ElseExpression);
+        }
+
+        private Instruccion AnalizeSecuence()
+        {   List<Identifier> SecuencesId = new List<Identifier>();
+
+            siguienteToken();
+            Console.WriteLine(tokenActual.Valor);
+              
+            while(tokenActual.Tipo != TipoToken.ClosingBrace)
+            {   
+                SecuencesId.Add((Identifier)AnalizeExpresion()); 
+                 siguienteToken();
+                 if(tokenActual.Tipo == TipoToken.Coma)
+                 {
+                    siguienteToken();
+                 }
+
+                 
+              
+                
+                
+            }
+          return new SecuenceFigure(SecuencesId);
+        }
+     
+
+    
 
         public ArcFunction AnalizeArcFunction()
         {
