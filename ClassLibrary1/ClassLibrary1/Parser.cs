@@ -42,6 +42,16 @@ namespace ClassLibrary1
             }
         }
 
+        public Token NextToken()
+        {
+            Token valor = tokens[indice];
+            indice++;
+               
+            
+
+            return valor;
+        }
+
         List<Instruccion> instructions = new List<Instruccion>();
 
         public List<Instruccion> ParseInstructions()
@@ -58,31 +68,82 @@ namespace ClassLibrary1
             return instructions;
         }
         public Instruccion Analize()
-        {
+        {    
+            if (tokenActual.Tipo == TipoToken.Identificador )
+            {                                   
+                 return AnalizeAsignation();
+            }
+            if (tokenActual.Tipo == TipoToken.IfKeyWord )
+            {                                  
+                 return AnalizarIfElse();
+            }
             Instruccion nodo = AnalizeExpresion();
             return nodo;
         }
 
         private Instruccion AnalizeExpresion()
         {
-            if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "point")
-            { 
+            if (tokenActual.Tipo == TipoToken.Point)
+            {
                 return AnalizePoint();
             }
-            else if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "line")
+            else if (tokenActual.Tipo == TipoToken.Line)
             {
                 return AnalizeLine();
             }
 
             else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "draw")
-            {   
+            {
                 return AnalizeDraw();
             }
-            else if (tokenActual.Tipo == TipoToken.Identificador && tokenActual.Valor == "circle")
+            else if (tokenActual.Tipo == TipoToken.Circle)
             {
                 return AnalizeCircle();
             }
-            
+            else if (tokenActual.Tipo == TipoToken.Ray)
+            {
+                return AnalizeRay();
+            }
+            else if (tokenActual.Tipo == TipoToken.Segment)
+            {
+                return AnalizeLine();
+            }
+
+            else if (tokenActual.Tipo == TipoToken.LineFunction)
+            {
+                return AnalizeLineFunction();
+            }
+
+            else if (tokenActual.Tipo == TipoToken.Circle)
+            {
+                return AnalizeCircleFunction();
+            }
+
+            else if (tokenActual.Tipo == TipoToken.SegmentFunction)
+            {
+                return AnalizeSegmentFunction();
+            }
+            else if (tokenActual.Tipo == TipoToken.RayFunction)
+            {
+                return AnalizeRayFunction();
+            }
+            else if (tokenActual.Tipo == TipoToken.ArcFunction)
+            {
+                return AnalizeArcFunction();
+            }
+
+            else if (tokenActual.Tipo == TipoToken.OpeningBrace)
+            {   
+                return AnalizeSecuence();
+            }
+
+            else if (tokenActual.Tipo == TipoToken.Numero )
+            {                                   
+                 return AnalizeNumber();
+            }
+
+
+
 
             else if (tokenActual.Tipo == TipoToken.Identificador)
             { 
@@ -92,17 +153,11 @@ namespace ClassLibrary1
 
 
 
-            // else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "ray")
-            // {
-            //     instructions.Add(AnalizeRay());
-            // }
 
 
 
-            // else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "segment")
-            // {
-            //     instructions.Add(AnalizeLine());
-            // }
+
+
 
             // else if (tokenActual.Tipo == TipoToken.PalabraReservada && tokenActual.Valor == "segment")
             // {
@@ -113,23 +168,10 @@ namespace ClassLibrary1
             // {
             //     instructions.Add(AnalizePointSecuence());
             // }
-            // else if (tokenActual.Tipo == TipoToken.LineFunction)
-            // {
-            //     instructions.Add(AnalizeLineFunction());
-            // }
 
-            // else if (tokenActual.Tipo == TipoToken.SegmentFunction)
-            // {
-            //     instructions.Add(AnalizeSegmentFunction());
-            // }
-            // else if (tokenActual.Tipo == TipoToken.RayFunction)
-            // {
-            //     instructions.Add(AnalizeRayFunction());
-            // }
-            // else if (tokenActual.Tipo == TipoToken.ArcFunction)
-            // {
-            //     instructions.Add(AnalizeArcFunction());
-            // }
+
+
+
             // else if (tokenActual.Tipo == TipoToken.IntersectFunction)
             // {
             //     instructions.Add(AnalizeIntersectFunction());
@@ -138,10 +180,7 @@ namespace ClassLibrary1
             // {
             //     instructions.Add(AnalizeMeasureFunction());
             // }
-            // else if (tokenActual.Tipo == TipoToken.CircleFunction)
-            // {
-            //     instructions.Add(AnalizeCircleFunction());
-            // }
+
             // else if (tokenActual.Tipo == TipoToken.Identificador)
             // {
             //     instructions.Add(AnalizeIdentificador());
@@ -175,6 +214,133 @@ namespace ClassLibrary1
 
         }
 
+        private Instruccion AnalizeAsignation()
+        {   List<string> nombres = new List<string>(); 
+            while(tokenActual.Tipo != TipoToken.OperadorAsignación)
+            {
+                  nombres.Add(tokenActual.Valor);
+                  siguienteToken(); 
+            }
+
+            siguienteToken();
+           
+           Instruccion asignation = AnalizeExpresion();
+           
+           
+           
+            
+            return new AnalizeAsignation(nombres,asignation);
+
+        }
+
+                 public Instruccion AnalizeNumber()
+
+         {  
+            int value = int.Parse(tokenActual.Valor);
+            siguienteToken();
+            return new Number(value);
+
+         }
+
+       public IfElseExpression AnalizarIfElse()
+        {
+            
+            siguienteToken();
+
+
+
+            Instruccion IfExpression = AnalizeExpresion();
+
+            
+            if (tokenActual.Tipo != TipoToken.ThenKeyWord)
+            {
+                throw new Exception("Error: Se esperaba la expresion ¨then¨.");
+
+            }
+            siguienteToken();
+             
+
+            Instruccion ThenExpression = AnalizeExpresion();
+            
+            if (tokenActual.Tipo != TipoToken.ElseKeyWord)
+            {
+                throw new Exception("Error: Se esperaba la expresion ¨Else¨.");
+
+            }
+
+             siguienteToken();
+            
+            Instruccion ElseExpression = AnalizeExpresion();
+
+
+
+
+            return new IfElseExpression(IfExpression, ThenExpression, ElseExpression);
+        }
+
+        private Instruccion AnalizeSecuence()
+        {   List<Identifier> SecuencesId = new List<Identifier>();
+
+            siguienteToken();
+            Console.WriteLine(tokenActual.Valor);
+              
+            while(tokenActual.Tipo != TipoToken.ClosingBrace)
+            {   
+                SecuencesId.Add((Identifier)AnalizeExpresion()); 
+                 siguienteToken();
+                 if(tokenActual.Tipo == TipoToken.Coma)
+                 {
+                    siguienteToken();
+                 }
+
+                 
+              
+                
+                
+            }
+          return new SecuenceFigure(SecuencesId);
+        }
+     
+
+    
+
+        public ArcFunction AnalizeArcFunction()
+        {
+            siguienteToken();
+            siguienteToken();
+
+            Point p1 = AnalizePoint();
+            Point p2 = AnalizePoint();
+            Point p3 = AnalizePoint();
+            double m = double.Parse(NextToken().Valor);
+
+            siguienteToken();
+
+
+
+
+
+            return new ArcFunction(p1, p2, p3, m);
+
+        }
+
+        public FunctionLine AnalizeLineFunction()
+        {
+            siguienteToken();
+            siguienteToken();
+
+            Point p1 = AnalizePoint();  
+
+            siguienteToken();
+
+            Point p2 = AnalizePoint();
+
+            siguienteToken();
+
+            return new FunctionLine(p1, p2);
+
+        }
+
         public Point AnalizePoint()
         {
             siguienteToken();
@@ -199,6 +365,53 @@ namespace ClassLibrary1
             return new Ray(id);
         }
 
+        public CircleFunction AnalizeCircleFunction()
+        {
+            siguienteToken();
+            siguienteToken();
+
+            Point p1 = AnalizePoint();
+
+            double m = double.Parse(NextToken().Valor);
+
+            siguienteToken();
+
+            return new CircleFunction(p1, m);
+
+        }
+
+        public SegmentFunction AnalizeSegmentFunction()
+        {
+            siguienteToken();
+            siguienteToken();
+
+            Point p1 = AnalizePoint();
+
+            siguienteToken();
+
+            Point p2 = AnalizePoint();
+
+            siguienteToken();
+
+            return new SegmentFunction(p1, p2);
+
+        }
+        public RayFunction AnalizeRayFunction()
+        {
+            siguienteToken();
+            siguienteToken();
+
+            Point p1 = AnalizePoint();
+
+            siguienteToken();
+
+            Point p2 = AnalizePoint();
+
+            siguienteToken();
+
+            return new RayFunction(p1, p2);
+
+        }
         public Line AnalizeLine()
         {
             siguienteToken();
@@ -239,94 +452,12 @@ namespace ClassLibrary1
 
 //         }
 
-//         public FunctionLine AnalizeLineFunction()
-//         {
-//             siguienteToken();
-//             siguienteToken();
 
-//             Point p1 = AnalizePoint();
 
-//             siguienteToken();
 
-//             Point p2 = AnalizePoint();
 
-//             siguienteToken();
 
-//             return new FunctionLine(p1, p2);
 
-//         }
-
-//         public SegmentFunction AnalizeSegmentFunction()
-//         {
-//             siguienteToken();
-//             siguienteToken();
-
-//             Point p1 = AnalizePoint();
-
-//             siguienteToken();
-
-//             Point p2 = AnalizePoint();
-
-//             siguienteToken();
-
-//             return new SegmentFunction(p1, p2);
-
-//         }
-//         public RayFunction AnalizeRayFunction()
-//         {
-//             siguienteToken();
-//             siguienteToken();
-
-//             Point p1 = AnalizePoint();
-
-//             siguienteToken();
-
-//             Point p2 = AnalizePoint();
-
-//             siguienteToken();
-
-//             return new RayFunction(p1, p2);
-
-//         }
-//         public ArcFunction AnalizeArcFunction()
-//         {
-//             siguienteToken();
-//             siguienteToken();
-
-//             Point p1 = (Point)AnalizeExpresion();
-
-//             siguienteToken();
-
-//             Point p2 = (Point)AnalizeExpresion();
-
-//             siguienteToken();
-
-//             Point p3 = (Point)AnalizeExpresion();
-
-//             siguienteToken();
-
-//             double m = 0;
-
-//             return new ArcFunction(p1, p2, p3, m);
-
-//         }
-
-//         public CircleFunction AnalizeCircleFunction()
-//         {
-//             siguienteToken();
-//             siguienteToken();
-
-//             Point p1 = (Point)AnalizeExpresion();
-
-//             siguienteToken();
-
-//             double m = 0;
-
-//             siguienteToken();
-
-//             return new CircleFunction(p1, m);
-
-//         }
 
 //         public MeasureFunction AnalizeMeasureFunction()
 //         {
