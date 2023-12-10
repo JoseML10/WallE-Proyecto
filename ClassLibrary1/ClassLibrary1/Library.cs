@@ -93,6 +93,15 @@ namespace ClassLibrary1
                 }
             }
 
+            else if (Value is Funcion fun)
+            {
+                foreach (var nombre in Nombre)
+                {
+
+                    entorno.DefinirVariable(new Variable(nombre, Value.Evaluate(entorno)));
+                }
+            }
+
             else
             {
                 // Si Value no es una secuencia, se asigna el valor a todas las variables
@@ -108,7 +117,6 @@ namespace ClassLibrary1
 
 
     }
-
 
     public sealed class Identifier : Instruccion
     {
@@ -161,16 +169,15 @@ namespace ClassLibrary1
 
     }
 
-
-    public sealed class FunctionLine : Figura
+    public sealed class FunctionLine : Funcion
     {
 
-        public Point Punto1 { get; }
-        public Point Punto2 { get; }
+        public Identifier Punto1 { get; }
+        public Identifier Punto2 { get; }
 
-        public override string nombre { get; set; }
 
-        public FunctionLine(Point P1, Point P2)
+
+        public FunctionLine(Identifier P1, Identifier P2)
         {
 
             this.Punto1 = P1;
@@ -180,14 +187,13 @@ namespace ClassLibrary1
 
         public override object Evaluate(Entorno entorno)
         {
-            //this.nombre = "line";
-            //var point = new Variable(nombre, this);
-            //entorno.DefinirVariable(point);
-            //entorno.figuras.Add((Figura)this);
-            return this;
+
+            return new Line((Point)entorno.BuscarVariable(Punto1.name).Value, (Point)entorno.BuscarVariable(Punto1.name).Value);
 
         }
     }
+
+
 
     public sealed class SegmentFunction : Figura
     {
@@ -464,25 +470,32 @@ namespace ClassLibrary1
     {
         public Point Punto1 { get; }
         public Point Punto2 { get; }
+        public override string nombre { get; set; }
+
+        // Constructor que recibe el nombre como un string
         public Line(string nombre)
         {
-            Point p2 = new Point("p1");
-            Point p1 = new Point("p2");
+            Point p1 = new Point("p1");
+            Point p2 = new Point("p2");
 
             Punto1 = p1;
             Punto2 = p2;
             this.nombre = nombre;
-
         }
 
-
-        public override string nombre { get; set; }
+        // Constructor que recibe dos objetos de tipo Point
+        public Line(Point punto1, Point punto2)
+        {
+            Punto1 = punto1;
+            Punto2 = punto2;
+            this.nombre = "Linea sin nombre";
+        }
 
         public override object Evaluate(Entorno entorno)
         {
-            var line = new Variable(nombre,this);
-             entorno.DefinirVariable(line);
-             return null;
+            var line = new Variable(nombre, this);
+            entorno.DefinirVariable(line);
+            return null;
         }
     }
 
