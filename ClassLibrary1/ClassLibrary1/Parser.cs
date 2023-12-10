@@ -329,13 +329,19 @@ namespace ClassLibrary1
             siguienteToken();
             siguienteToken();
 
-            Point p1 = AnalizePoint();  
+            Identifier p1 = (Identifier)AnalizeExpresion();
 
             siguienteToken();
 
-            Point p2 = AnalizePoint();
+            Identifier p2 = (Identifier)AnalizeIdentifier();
 
             siguienteToken();
+            siguienteToken();
+            siguienteToken();
+
+
+
+
 
             return new FunctionLine(p1, p2);
 
