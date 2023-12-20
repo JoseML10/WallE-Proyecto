@@ -14,8 +14,9 @@ namespace ClassLibrary1
 
         Segment,
 
+        SequenceToken,
 
-
+        Punto,
 
         Circle,
 
@@ -27,6 +28,9 @@ namespace ClassLibrary1
         MeasureFunction,
         CircleFunction,
         IntersectFunction,
+        RandomFunction,
+        PointsFunction,
+        SamplesFunction,
 
         Funcion,
         Identificador,
@@ -38,6 +42,10 @@ namespace ClassLibrary1
         ClosingParenthesis,
         OpeningBrace,
         ClosingBrace,
+        
+        InfiniteSequence,
+        RangeSequence,
+
 
 
         Math,
@@ -45,12 +53,10 @@ namespace ClassLibrary1
         PuntoComa,
         Coma,
 
-        Desconocido,
-
-        Flecha,
+      
 
         Cadena,
-
+        DeclaratedFunction,
         Concatenador,
         PointSecuence,
         LineFunction,
@@ -58,6 +64,20 @@ namespace ClassLibrary1
         ElseKeyWord,
         ThenKeyWord,
         Arc,
+        Let,
+        inOfLet,
+        blue,
+        red,
+        yellow,
+        green,
+        cyan,
+        magenta,
+        white,
+        gray,
+        black,
+        color,
+        restore,
+        Unknown,
     }
 
 
@@ -93,15 +113,15 @@ namespace ClassLibrary1
         {
             { "print", TipoToken.PalabraReservada },
             { "function", TipoToken.PalabraReservada },
-            { "let", TipoToken.PalabraReservada },
-            { "in", TipoToken.PalabraReservada },
+            { "let", TipoToken.Let },
+            { "in", TipoToken.inOfLet },
             { "if", TipoToken.IfKeyWord},
             { "else", TipoToken.ElseKeyWord },
              { "then", TipoToken.ThenKeyWord },
             { "draw", TipoToken.PalabraReservada },
             { "measure", TipoToken.PalabraReservada },
-            { "color", TipoToken.PalabraReservada },
-            { "restore", TipoToken.PalabraReservada },
+            { "color", TipoToken.color },
+            { "restore", TipoToken.restore },
             { "import", TipoToken.PalabraReservada },
             { "circle", TipoToken.Circle },
             { "line", TipoToken.Line },
@@ -111,7 +131,6 @@ namespace ClassLibrary1
             { "randoms", TipoToken.PalabraReservada},
             { "point", TipoToken.Point },
             { "samples", TipoToken.PalabraReservada },
-
 
         };
 
@@ -123,8 +142,10 @@ namespace ClassLibrary1
             { "segment", TipoToken.SegmentFunction },
             { "ray", TipoToken.RayFunction},
             { "arc", TipoToken.ArcFunction },
-
-
+            { "measure" , TipoToken.MeasureFunction },
+            { "points" , TipoToken.MeasureFunction },
+            { "random" , TipoToken.MeasureFunction },
+            { "samples" , TipoToken.MeasureFunction },
         };
 
 
@@ -185,9 +206,22 @@ namespace ClassLibrary1
                     }
                     if (caracterActual == '{')
                     {
+                       if(Char.IsDigit(codigoFuente[indice+1]))
+                       {
+                          tokens.Add(new Token(TipoToken.SequenceToken, caracterActual.ToString()));
+                          indice++;
+                          continue;
+
+
+                       }
+                       else
+                       {
                         tokens.Add(new Token(TipoToken.OpeningBrace, caracterActual.ToString()));
                         indice++;
                         continue;
+                       }
+
+                      
                     }
                     if (caracterActual == '}')
                     {
@@ -265,6 +299,12 @@ namespace ClassLibrary1
                         continue;
 
                     }
+                    else if (codigoFuente[indice] == '(')
+                    {
+                        tokens.Add(new Token(TipoToken.DeclaratedFunction, palabra));
+                        continue;
+
+                    }
                     else if (Math.ContainsKey(palabra))
                     {
                         tokens.Add(new Token(Math[palabra], palabra));
@@ -323,18 +363,21 @@ namespace ClassLibrary1
                             continue;
                         }
 
-                        else if (indice + 1 < codigoFuente.Length && codigoFuente[indice + 1] == '>')
-                        {
-                            tokens.Add(new Token(TipoToken.Flecha, "=>"));
-                            indice += 2;
-                            continue;
-                        }
+                        
                         else
                         {
                             tokens.Add(new Token(TipoToken.OperadorAsignación, "="));
                             indice++;
                             continue;
                         }
+                    }
+                    if(caracterActual =='.')
+                    {
+
+                    tokens.Add(new Token(TipoToken.Punto, caracterActual.ToString()));
+                    indice++;
+                    continue;
+
                     }
                     if (caracterActual == '!')
                     {
@@ -346,13 +389,13 @@ namespace ClassLibrary1
                         }
                         else
                         {
-                            tokens.Add(new Token(TipoToken.Desconocido, caracterActual.ToString()));
+                            tokens.Add(new Token(TipoToken.Unknown, caracterActual.ToString()));
 
                             throw new Exception("Caracter desconocido en : " + indice);
 
                         }
                     }
-                    tokens.Add(new Token(TipoToken.Desconocido, caracterActual.ToString()));
+                    tokens.Add(new Token(TipoToken.Unknown, caracterActual.ToString()));
 
                     throw new Exception("Caracter desconocido en : " + indice);
 
